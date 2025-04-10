@@ -3,7 +3,7 @@ services:
     # build:
     #   context: .
     #   dockerfile: Dockerfile.web
-    image: praptiag11/my-web-app:v3.1
+    image: praptiag11/my-web-app:v3.0
     container_name: flask-container
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
@@ -38,7 +38,7 @@ services:
     # build:
     #   context: .
     #   dockerfile: Dockerfile.db
-    image: praptiag11/my-db:v2.1
+    image: praptiag11/my-db:v2.0
     container_name: db-container
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
@@ -64,7 +64,7 @@ services:
     # build:
     #   context: .
     #   dockerfile: Dockerfile.cache
-    image: praptiag11/my-redis:v1.1
+    image: praptiag11/my-redis:v1.0
     container_name: redis-container
     ports:
       - "6379:6379"
