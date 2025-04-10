@@ -38,7 +38,7 @@ services:
     # build:
     #   context: .
     #   dockerfile: Dockerfile.db
-    image: praptiag11/my-db:v1.0
+    image: praptiag11/my-db:v2.0
     container_name: db-container
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
