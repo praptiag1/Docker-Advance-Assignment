@@ -6,7 +6,7 @@ git pull origin main
 
 # 2. Stop and clean existing containers
 echo "Removing old containers..."
-docker compose down
+docker compose down --remove-orphans
 
 # # 3. Pull images (no builds)
 # echo "Pulling latest images..."
