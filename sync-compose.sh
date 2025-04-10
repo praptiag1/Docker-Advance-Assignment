@@ -2,9 +2,9 @@
 
 # 1. Get latest compose file
 echo "Syncing docker-compose.yaml..."
-git stash push -m "Auto-stash before pull"
+
 git pull origin main
-git stash pop || true
+
 # 2. Stop and clean existing containers
 echo "Removing old containers..."
 docker compose down
