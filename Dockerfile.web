@@ -5,7 +5,7 @@ FROM python:alpine3.21
 WORKDIR /app
 
 # Create non-root user
-RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+# RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 
 # Copy requirements and install dependencies
 COPY requirements.txt .
@@ -15,7 +15,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY app /app
 
 # Switch to non-root user
-USER appuser
+# USER appuser
 
 # Expose the port the app runs on
 EXPOSE 5000

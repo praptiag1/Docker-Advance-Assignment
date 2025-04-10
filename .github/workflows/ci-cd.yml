@@ -44,9 +44,9 @@ jobs:
       id: version
       run: |
         # Extract current versions from compose file
-        WEB_VERSION=$(grep -oP 'praptiag11/my-web-app:v\K\d+\.\d+' docker-compose.yml || echo "1.0")
-        DB_VERSION=$(grep -oP 'praptiag11/my-db:v\K\d+\.\d+' docker-compose.yml || echo "1.0")
-        REDIS_VERSION=$(grep -oP 'praptiag11/my-redis:v\K\d+\.\d+' docker-compose.yml || echo "1.0")
+        WEB_VERSION=$(grep -oP 'praptiag11/my-web-app:v\K\d+\.\d+' docker-compose.yaml || echo "1.0")
+        DB_VERSION=$(grep -oP 'praptiag11/my-db:v\K\d+\.\d+' docker-compose.yaml || echo "1.0")
+        REDIS_VERSION=$(grep -oP 'praptiag11/my-redis:v\K\d+\.\d+' docker-compose.yaml || echo "1.0")
         
         # Increment versions (here we increment minor version for each)
         NEW_WEB_VERSION=$(echo $WEB_VERSION | awk -F. '{print $1"."$2+1}')
@@ -79,18 +79,18 @@ jobs:
         docker build -t praptiag11/my-redis:v$NEW_REDIS_VERSION -f Dockerfile.cache .
         docker push praptiag11/my-redis:v$NEW_REDIS_VERSION
 
-    # Update docker-compose.yml with all new versions
-    - name: Update docker-compose.yml
+    # Update docker-compose.yaml with all new versions
+    - name: Update docker-compose.yaml
       run: |
-        sed -i "s|praptiag11/my-web-app:v[0-9.]\+|praptiag11/my-web-app:v$NEW_WEB_VERSION|g" docker-compose.yml
-        sed -i "s|praptiag11/my-db:v[0-9.]\+|praptiag11/my-db:v$NEW_DB_VERSION|g" docker-compose.yml
-        sed -i "s|praptiag11/my-redis:v[0-9.]\+|praptiag11/my-redis:v$NEW_REDIS_VERSION|g" docker-compose.yml
+        sed -i "s|praptiag11/my-web-app:v[0-9.]\+|praptiag11/my-web-app:v$NEW_WEB_VERSION|g" docker-compose.yaml
+        sed -i "s|praptiag11/my-db:v[0-9.]\+|praptiag11/my-db:v$NEW_DB_VERSION|g" docker-compose.yaml
+        sed -i "s|praptiag11/my-redis:v[0-9.]\+|praptiag11/my-redis:v$NEW_REDIS_VERSION|g" docker-compose.yaml
 
     # Commit and push the version updates
     - name: Commit and push changes
       run: |
         git config --global user.name "GitHub Actions"
         git config --global user.email "actions@github.com"
-        git add docker-compose.yml
+        git add docker-compose.yaml
         git commit -m "CI: Update service versions (web:v$NEW_WEB_VERSION, db:v$NEW_DB_VERSION, redis:v$NEW_REDIS_VERSION)"
         git push
