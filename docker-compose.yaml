@@ -22,17 +22,17 @@ services:
         condition: service_healthy
     networks:
       - my-network
-    restart: unless-stopped
-    security_opt:
-      - no-new-privileges:true
+    restart: always
+    # security_opt:
+    #   - no-new-privileges:true
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
       interval: 30s
       timeout: 10s
       retries: 3
-    read_only: true
-    cap_drop:
-      - ALL
+    # read_only: true
+    # cap_drop:
+    #   - ALL
 
   db:
     # build:
@@ -50,9 +50,10 @@ services:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - my-network
-    restart: unless-stopped
-    security_opt:
-      - no-new-privileges:true
+    restart: always
+    # restart: unless-stopped
+    # security_opt:
+    #   - no-new-privileges:true
     healthcheck:
       test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER}"]
       interval: 30s
@@ -69,9 +70,10 @@ services:
       - "6379:6379"
     networks:
       - my-network
-    restart: unless-stopped
-    security_opt:
-      - no-new-privileges:true
+    restart: always
+    # restart: unless-stopped
+    # security_opt:
+    #   - no-new-privileges:true
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 30s
