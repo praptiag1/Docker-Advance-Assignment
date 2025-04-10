@@ -93,4 +93,8 @@ jobs:
         git config --global user.email "actions@github.com"
         git add docker-compose.yaml
         git commit -m "CI: Update service versions (web:v$NEW_WEB_VERSION, db:v$NEW_DB_VERSION, redis:v$NEW_REDIS_VERSION)"
-        git push
+        if ! git push "https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" HEAD:main; then
+          echo "Push failed, retrying..."
+          sleep 5
+          git push "https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" HEAD:main
+        fi
