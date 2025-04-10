@@ -50,7 +50,7 @@ jobs:
         
         # Increment versions (here we increment minor version for each)
         NEW_WEB_VERSION=$(echo $WEB_VERSION | awk -F. '{print $1"."$2+1}')
-        NEW_DB_VERSION=$(echo $DB_VERSION | awk -F. '{print $1+1"."$2}')
+        NEW_DB_VERSION=$(echo $DB_VERSION | awk -F. '{print $1"."$2+1}')
         NEW_REDIS_VERSION=$(echo $REDIS_VERSION | awk -F. '{print $1"."$2+1}')
         
         # Set output variables
