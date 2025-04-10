@@ -1,0 +1,96 @@
+name: CI/CD Pipeline
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+env:
+  DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+  DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    # 1. Checkout code from repository
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    # # 2. Set up Python environment (for running tests)
+    # - name: Set up Python
+    #   uses: actions/setup-python@v4
+    #   with:
+    #     python-version: '3.13'
+
+    # # 3. Install Python dependencies
+    # - name: Install dependencies
+    #   run: |
+    #     python -m pip install --upgrade pip
+    #     pip install -r requirements.txt
+
+    # 4. Login to Docker Hub using secrets
+    - name: Login to Docker Hub
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+    # 6. Version increment logic (simplified for v1.0, v2.0 scheme)
+    - name: Determine new version
+      id: version
+      run: |
+        # Extract current versions from compose file
+        WEB_VERSION=$(grep -oP 'praptiag11/my-web-app:v\K\d+\.\d+' docker-compose.yml || echo "1.0")
+        DB_VERSION=$(grep -oP 'praptiag11/my-db:v\K\d+\.\d+' docker-compose.yml || echo "1.0")
+        REDIS_VERSION=$(grep -oP 'praptiag11/my-redis:v\K\d+\.\d+' docker-compose.yml || echo "1.0")
+        
+        # Increment versions (here we increment minor version for each)
+        NEW_WEB_VERSION=$(echo $WEB_VERSION | awk -F. '{print $1"."$2+1}')
+        NEW_DB_VERSION=$(echo $DB_VERSION | awk -F. '{print $1+1"."$2}')
+        NEW_REDIS_VERSION=$(echo $REDIS_VERSION | awk -F. '{print $1"."$2+1}')
+        
+        # Set output variables
+        echo "NEW_WEB_VERSION=${NEW_WEB_VERSION}" >> $GITHUB_ENV
+        echo "NEW_DB_VERSION=${NEW_DB_VERSION}" >> $GITHUB_ENV
+        echo "NEW_REDIS_VERSION=${NEW_REDIS_VERSION}" >> $GITHUB_ENV
+        
+        echo "New versions:"
+        echo "Web: v${NEW_WEB_VERSION}"
+        echo "DB: v${NEW_DB_VERSION}"
+        echo "Redis: v${NEW_REDIS_VERSION}"
+
+    # Build and push each service with its own version
+    - name: Build and push web service
+      run: |
+        docker build -t praptiag11/my-web-app:v$NEW_WEB_VERSION -f Dockerfile.web .
+        docker push praptiag11/my-web-app:v$NEW_WEB_VERSION
+
+    - name: Build and push db service
+      run: |
+        docker build -t praptiag11/my-db:v$NEW_DB_VERSION -f Dockerfile.db .
+        docker push praptiag11/my-db:v$NEW_DB_VERSION
+
+    - name: Build and push redis service
+      run: |
+        docker build -t praptiag11/my-redis:v$NEW_REDIS_VERSION -f Dockerfile.cache .
+        docker push praptiag11/my-redis:v$NEW_REDIS_VERSION
+
+    # Update docker-compose.yml with all new versions
+    - name: Update docker-compose.yml
+      run: |
+        sed -i "s|praptiag11/my-web-app:v[0-9.]\+|praptiag11/my-web-app:v$NEW_WEB_VERSION|g" docker-compose.yml
+        sed -i "s|praptiag11/my-db:v[0-9.]\+|praptiag11/my-db:v$NEW_DB_VERSION|g" docker-compose.yml
+        sed -i "s|praptiag11/my-redis:v[0-9.]\+|praptiag11/my-redis:v$NEW_REDIS_VERSION|g" docker-compose.yml
+
+    # Commit and push the version updates
+    - name: Commit and push changes
+      run: |
+        git config --global user.name "GitHub Actions"
+        git config --global user.email "actions@github.com"
+        git add docker-compose.yml
+        git commit -m "CI: Update service versions (web:v$NEW_WEB_VERSION, db:v$NEW_DB_VERSION, redis:v$NEW_REDIS_VERSION)"
+        git push

@@ -1,0 +1,86 @@
+services:
+  web:
+    # build:
+    #   context: .
+    #   dockerfile: Dockerfile.web
+    image: praptiag11/my-web-app:v3.0
+    container_name: flask-container
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_HOST: db-container
+      POSTGRES_PORT: ${POSTGRES_PORT}
+      POSTGRES_DB: ${POSTGRES_DB}
+      REDIS_HOST: redis-container
+      REDIS_PORT: ${REDIS_PORT}
+    ports:
+      - "5000:5000"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - my-network
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    read_only: true
+    cap_drop:
+      - ALL
+
+  db:
+    # build:
+    #   context: .
+    #   dockerfile: Dockerfile.db
+    image: praptiag11/my-db:v1.0
+    container_name: db-container
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - my-network
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER}"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  redis:
+    # build:
+    #   context: .
+    #   dockerfile: Dockerfile.cache
+    image: praptiag11/my-redis:v1.0
+    container_name: redis-container
+    ports:
+      - "6379:6379"
+    networks:
+      - my-network
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+volumes:
+  postgres_data:
+    
+networks:
+  my-network:
+    driver: bridge

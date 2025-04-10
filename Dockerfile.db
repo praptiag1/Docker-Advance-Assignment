@@ -1,0 +1,11 @@
+# Use the official PostgreSQL image
+FROM postgres:16.8-alpine3.20
+
+
+# # Set environment variables
+# ENV POSTGRES_USER=myuser
+# ENV POSTGRES_PASSWORD=mypassword
+# ENV POSTGRES_DB=mydatabase
+
+# Expose PostgreSQL default port
+EXPOSE 5432
