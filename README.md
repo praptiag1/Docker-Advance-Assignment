@@ -25,6 +25,18 @@ The solution includes:
 •	Security best practices
 
 ## Setup Instructions:
+1. **Clone repository**
+   - git clone https://github.com/praptiag1/Docker-Basic-Assignment
+   - cd Docker-Basic-Assignment
+2. **Run the Application**
+Start all services using Docker Compose:
+    - docker-compose up -d
+This will start the Flask app, PostgreSQL database, and Redis cache in detached mode.
+3. **Verify Running Containers**
+    - docker ps
+4. **Access the Application**
+     http://localhost:5000
+   OR
 Copy and run the give shell script:
               #!/bin/bash
               
