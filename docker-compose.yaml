@@ -23,16 +23,19 @@ services:
     networks:
       - my-network
     restart: always
-    # security_opt:
-    #   - no-new-privileges:true
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
       interval: 30s
       timeout: 10s
       retries: 3
-    # read_only: true
-    # cap_drop:
-    #   - ALL
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    tmpfs:
+      - /tmp  # For any temporary files the app might need
+    user: "myuser"
 
   db:
     # build:
@@ -51,14 +54,20 @@ services:
     networks:
       - my-network
     restart: always
-    # restart: unless-stopped
-    # security_opt:
-    #   - no-new-privileges:true
     healthcheck:
       test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER}"]
       interval: 30s
       timeout: 10s
       retries: 5
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN  # Needed for Postgres to manage file ownership
+      - DAC_OVERRIDE  # Needed for Postgres file access
+      - SETGID
+      - SETUID
 
   redis:
     # build:
@@ -71,17 +80,28 @@ services:
     networks:
       - my-network
     restart: always
-    # restart: unless-stopped
-    # security_opt:
-    #   - no-new-privileges:true
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 30s
       timeout: 5s
       retries: 3
+    user: "101:101"
+    volumes:
+      - redis_data:/data
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - SETGID  # Required for Redis user switching
+      - SETUID  # Required for Redis user switching
+    read_only: true
+    tmpfs:
+      - /tmp  # For Redis temporary files
 
 volumes:
   postgres_data:
+  redis_data:
     
 networks:
   my-network:

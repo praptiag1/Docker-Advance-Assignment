@@ -2,7 +2,6 @@
 
 # 1. Get latest compose file
 echo "Syncing docker-compose.yaml..."
-
 git pull origin main
 
 # 2. Stop and clean existing containers
