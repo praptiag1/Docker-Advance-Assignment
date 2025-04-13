@@ -27,16 +27,27 @@ curl -sSL "$ENV_EXAMPLE_URL" -o .env
 if [ ! -f ".env" ]; then
   cp .env.example .env
   echo "Created .env file from example. Please edit it with your configuration."
+else
+  echo ".env file already exists. Using existing configuration."
 fi
 
 echo "
-Cloning complete!
+Setup complete!
 
-To stop:    docker-compose down (in $TARGET_DIR)
-            docker compose down -v
-To start the application:   docker compose up -d
-Access the application at:  http://localhost:5000
-To restart: docker-compose restart
-To view logs: docker-compose logs
+Next steps:
+1. Edit the .env file if needed: 
+   nano $TARGET_DIR/.env
+
+2. Start the application:
+   cd $TARGET_DIR && docker compose up -d
+
+3. Access the application at:  
+   http://localhost:5000
+
+Management commands:
+- Stop:          docker compose down
+- Stop & clean:  docker compose down -v
+- Restart:       docker compose restart
+- View logs:     docker compose logs
 "
 
