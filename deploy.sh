@@ -4,7 +4,7 @@
 set -e
 
 # Configuration
-COMPOSE_URL="https://raw.githubusercontent.com/praptiag1/Docker-Advance-Assignment/main/docker-compose.yml"
+COMPOSE_URL="https://raw.githubusercontent.com/praptiag1/Docker-Advance-Assignment/main/docker-compose.yaml"
 ENV_EXAMPLE_URL="https://raw.githubusercontent.com/praptiag1/Docker-Advance-Assignment/main/.env.example"
 TARGET_DIR="./myapp"
 
